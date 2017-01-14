@@ -12,16 +12,27 @@
 -- We slightly diverge from the standard and do not allow for the "floating-suffix,"
 -- as the type inference of Haskell makes this unnecessary.
 -----------------------------------------------------------------------------
-module Data.Numbers.FloatingHex (hf, showHFloat) where
+module Data.Numbers.FloatingHex (hf, readHFloat, showHFloat) where
 
 import Data.Char  (toLower)
 import Data.Ratio ((%))
-import Numeric    (showHex)
+import Numeric    (showHex, floatToDigits)
 
 import qualified Language.Haskell.TH.Syntax as TH
 import           Language.Haskell.TH.Quote
 
--- | Turn a hexadecimal float to an internal double, if parseable.
+-- | Read a float in hexadecimal binary format. Supports negative numbers, and nan/infinity as well.
+readHFloat :: RealFloat a => String -> Maybe a
+readHFloat = cvt
+  where cvt ('-' : cs) = ((-1) *) `fmap` go cs
+        cvt cs         = go cs
+
+        go "NaN"      = Just $ 0/0
+        go "Infinity" = Just $ 1/0
+        go cs         = (fromRational . toRational) `fmap` parseHexFloat cs
+
+-- | Turn a hexadecimal float to an internal double, if parseable. Does not support the leading
+-- sign bit.
 parseHexFloat :: String -> Maybe Double
 parseHexFloat = go0 . map toLower
   where go0 ('0':'x':rest) = go1 rest
@@ -84,28 +95,34 @@ hf = QuasiQuoter { quoteExp  = q
                   Just d  -> return (TH.LitP (TH.RationalL (toRational d)))
                   Nothing -> fail $ "Invalid hexadecimal floating point number: |" ++ s ++ "|"
 
--- | Show a floating-point value in the hexadecimal format.
---
--- NB. While this function will print a faithful (i.e., correct) value, it is
--- not 100% compatible with the @%a@ modifier as found in the C's printf implementation.
+-- | Show a floating-point value in the hexadecimal format, similar to the @%a@ modifier in C's printf.
 --
 -- >>> showHFloat (212.21 :: Double) ""
 -- "0x1.a86b851eb851fp7"
 -- >>> showHFloat (-12.76 :: Float) ""
--- "-0xc.c28f6p0"
+-- "-0x1.9851ecp3"
+-- >>> showHFloat (-0 :: Double) ""
+-- "-0x0p+0"
 showHFloat :: RealFloat a => a -> ShowS
-showHFloat x
- | isNaN x          = showString "nan"
- | isInfinite x     = showString $ if x > 0 then "+inf" else "-inf"
- | isNegativeZero x = showString "-0x0p1"
- | x < 0            = showString $ "-0x" ++ body
- | True             = showString $ "0x"  ++ body
- where (m, n)     = decodeFloat (abs x)
-       pre        = showHex m ""
-       (pre', l)  = case pre of
-                     ""    -> error $ "impossible happened! " ++ show (pre, m)
-                     (f:p) -> (f : trim p, length p)
-       trim s = case dropWhile (== '0') (reverse s) of
-                  "" -> ""
-                  t  -> "." ++ reverse t
-       body   = pre' ++ "p" ++ show (n + 4 * l)
+showHFloat = showString . fmt
+  where fmt x | isNaN x                   = "NaN"
+              | isInfinite x              = (if x < 0 then "-" else "") ++ "Infinity"
+              | x < 0 || isNegativeZero x = '-' : cvt (-x)
+              | True                      =       cvt x
+
+        cvt x
+          | x == 0 = "0x0p+0"
+          | True   = case floatToDigits 2 x of
+                       r@([], _) -> error $ "Impossible happened: showHFloat: " ++ show r
+                       (d:ds, e) -> "0x" ++ show d ++ frac ds ++ "p" ++ show (e-1)
+
+        -- Given binary digits, convert them to hex in blocks of 4
+        -- Special case: If all 0's, just drop it.
+        frac digits
+          | all (== 0) digits = ""
+          | True              = "." ++ hex digits
+          where hex ds
+                  | null ds       = ""
+                  | length ds < 4 = hex (take 4 (ds ++ repeat 0))
+                  | True          = let (d, r) = splitAt 4 ds in hexDigit d ++ hex r
+                hexDigit d        = showHex (foldl (\a b -> 2*a+b) 0 d) ""
