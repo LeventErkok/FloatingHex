@@ -7,7 +7,15 @@
 
 For syntax reference, see: <http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf>, pages 57-58.
 We slightly diverge from the standard and do not allow for the "floating-suffix,"
-as the type inference of Haskell makes this unnecessary.
+as the type inference of Haskell makes this unnecessary. Some examples are:
+
+```
+  0x1p+1
+  0x1p+8
+  0x1.b7p-1
+  0x1.fffffffffffffp+1023
+  0X1.921FB4D12D84AP-1
+```
 
 This format allows for concise and precise string representation for floating point numbers.
 
