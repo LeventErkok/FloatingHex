@@ -10,14 +10,14 @@ We slightly diverge from the standard and do not allow for the "floating-suffix,
 as the type inference of Haskell makes this unnecessary. Some examples are:
 
 ```
-  0x1p+1
-  0x1p+8
-  0x1.b7p-1
-  0x1.fffffffffffffp+1023
-  0X1.921FB4D12D84AP-1
+  [hf|0x1p+1|]
+  [hf|0x1p+8|]
+  [hf|0x1.b7p-1|]
+  [hf|0x1.fffffffffffffp+1023|]
+  [hf|0X1.921FB4D12D84AP-1|]
 ```
 
-This format allows for concise and precise string representation for floating point numbers.
+This format allows for concise and precise string representation for floating point numbers. Note that you need the `QuasiQuotes` extension of GHC to be able to write these literals.
 
 ## Example
 
