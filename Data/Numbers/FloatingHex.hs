@@ -22,6 +22,8 @@ import qualified Language.Haskell.TH.Syntax as TH
 import           Language.Haskell.TH.Quote
 
 -- | Read a float in hexadecimal binary format. Supports negative numbers, and nan/infinity as well.
+-- For regular usage, the quasiquoter (`hf`) should be employed. But this function can be handy for
+-- programmatic interfaces.
 readHFloat :: RealFloat a => String -> Maybe a
 readHFloat = cvt
   where cvt ('-' : cs) = ((-1) *) `fmap` go cs

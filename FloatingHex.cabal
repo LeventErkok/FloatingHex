@@ -1,5 +1,5 @@
 Name:                FloatingHex
-Version:             0.1
+Version:             0.2
 Synopsis:            Read and write hexadecimal floating point numbers
 Description:         Read and write hexadecimal floating point numbers. Provides a quasiquoter for
                      entering hex-float literals, and a function for printing them in hexadecimal.
@@ -16,7 +16,7 @@ Maintainer:          erkokl@gmail.com
 Copyright:           Levent Erkok
 Category:            Tools
 Build-type:          Simple
-Cabal-version:       >= 1.10
+Cabal-version:       >= 1.14
 Extra-Source-Files:  INSTALL, README.md, COPYRIGHT, CHANGES.md
 
 source-repository head
