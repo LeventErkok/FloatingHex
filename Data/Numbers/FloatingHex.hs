@@ -12,7 +12,14 @@
 -- We slightly diverge from the standard and do not allow for the "floating-suffix,"
 -- as the type inference of Haskell makes this unnecessary.
 -----------------------------------------------------------------------------
-module Data.Numbers.FloatingHex (hf, readHFloat, showHFloat) where
+module Data.Numbers.FloatingHex (
+        -- ** QuasiQuoting
+        hf
+        -- ** Reading hex-floats
+        , FloatingHexReader(..)
+        -- ** Showing hex-floats
+        , showHFloat
+        ) where
 
 import Data.Char  (toLower)
 import Data.Ratio ((%))
@@ -23,10 +30,10 @@ import qualified Language.Haskell.TH.Syntax as TH
 import           Language.Haskell.TH.Quote
 
 -- | Due to intricacies of conversion between
--- float/doubles (see <https://ghc.haskell.org/trac/ghc/ticket/3676>), we explicitly introduce
+-- @Float@ and @Double@ types (see <http://ghc.haskell.org/trac/ghc/ticket/3676>), we explicitly introduce
 -- a class to do the reading properly.
 class RealFloat a => FloatingHexReader a where
-   -- | Convert a hex-float to a Real-Float, if possible
+   -- | Convert a hex-float from a string, if possible.
    readHFloat :: String -> Maybe a
 
 -- | The Float instance
@@ -118,7 +125,7 @@ hf = QuasiQuoter { quoteExp  = q
                   Just d  -> return (TH.LitP (TH.RationalL (toRational d)))
                   Nothing -> fail $ "Invalid hexadecimal floating point number: |" ++ s ++ "|"
 
--- | Show a floating-point value in the hexadecimal format, similar to the @%a@ modifier in C's printf.
+-- | Show a floating-point value in the hexadecimal format, similar to the @%a@ specifier in C's printf.
 --
 -- >>> showHFloat (212.21 :: Double) ""
 -- "0x1.a86b851eb851fp7"
