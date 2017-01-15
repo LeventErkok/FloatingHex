@@ -39,4 +39,8 @@ g d            = "something else: " ++ show d
 test = showHFloat [hf|0x1.f44abd5aa7ca4p+25|] ""
 ```
 
-(Note that while the quasiquoter allows for floating-point patterns, it is usually not a good idea to have floating-point literals used in pattern matching.)
+(Note that while the quasiquoter allows for floating-point patterns, it is usually not a good idea to use floating-point literals in pattern matching.)
+
+### Thanks
+The following people reported bugs, provided comments/feedback, or contributed to the development of
+FloatingHex in various ways: Herbert Valerio Riedel.

@@ -3,6 +3,11 @@
 
 * Latest Hackage released version: 0.2, 2017-01-14
 
+### Version 0.3, Not yet released
+
+  * Bump up template-haskell dependency to >= 2.10. As noted by Herbert Valerio Riedel,
+    FloatingHex fails to compile with older versions.
+
 ### Version 0.2, 2017-01-14
 
   * Support for parsing nan/infinity values
