@@ -1,7 +1,7 @@
 * Hackage: <http://hackage.haskell.org/package/FloatingHex>
 * GitHub:  <http://github.com/LeventErkok/FloatingHex/>
 
-* Latest Hackage released version: 0.2, 2017-01-14
+* Latest Hackage released version: 0.3, 2017-01-15
 
 ### Version 0.3, 2017-01-15
 
