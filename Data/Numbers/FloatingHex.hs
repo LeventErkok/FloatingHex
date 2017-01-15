@@ -17,27 +17,46 @@ module Data.Numbers.FloatingHex (hf, readHFloat, showHFloat) where
 import Data.Char  (toLower)
 import Data.Ratio ((%))
 import Numeric    (showHex, floatToDigits)
+import GHC.Float
 
 import qualified Language.Haskell.TH.Syntax as TH
 import           Language.Haskell.TH.Quote
 
+-- | Due to intricacies of conversion between
+-- float/doubles (see <https://ghc.haskell.org/trac/ghc/ticket/3676>), we explicitly introduce
+-- a class to do the reading properly.
+class RealFloat a => FloatingHexReader a where
+   -- | Convert a hex-float to a Real-Float, if possible
+   readHFloat :: String -> Maybe a
+
+-- | The Float instance
+instance FloatingHexReader Float where
+   readHFloat s = double2Float `fmap` readHFloatAsDouble s
+
+-- | The Double instance
+instance FloatingHexReader Double where
+   readHFloat = readHFloatAsDouble
+
 -- | Read a float in hexadecimal binary format. Supports negative numbers, and nan/infinity as well.
 -- For regular usage, the quasiquoter (`hf`) should be employed. But this function can be handy for
 -- programmatic interfaces.
-readHFloat :: RealFloat a => String -> Maybe a
-readHFloat = cvt
+readHFloatAsDouble :: String -> Maybe Double
+readHFloatAsDouble = cvt
   where cvt ('-' : cs) = ((-1) *) `fmap` go cs
         cvt cs         = go cs
 
         go "NaN"      = Just $ 0/0
         go "Infinity" = Just $ 1/0
-        go cs         = (fromRational . toRational) `fmap` parseHexFloat cs
+        go cs         = parseHexFloat cs
 
 -- | Turn a hexadecimal float to an internal double, if parseable. Does not support the leading
--- sign bit.
+-- '-' bit, although it does allow a leading +. (The former is best done out of the quasiquote.)
 parseHexFloat :: String -> Maybe Double
-parseHexFloat = go0 . map toLower
-  where go0 ('0':'x':rest) = go1 rest
+parseHexFloat = goS . map toLower
+  where goS ('+':rest) = go0 rest
+        goS cs         = go0 cs
+
+        go0 ('0':'x':rest) = go1 rest
         go0 _              = Nothing
 
         go1 cs = case break (== 'p') cs of
@@ -60,12 +79,12 @@ parseHexFloat = go0 . map toLower
 
         val :: Integer -> Int -> Integer -> Double
         val a b e
-          | e > 0 = fromRational $ (top * expt) % bot
-          | True  = fromRational $ top % (expt * bot)
-          where top, bot, expt :: Integer
-                top  = a
-                bot  = 16 ^ b
-                expt =  2 ^ abs e
+          | e > 0 = fromRational $ (top * power) % bot
+          | True  = fromRational $ top % (power * bot)
+          where top, bot, power :: Integer
+                top   = a
+                bot   = 16 ^ b
+                power =  2 ^ abs e
 
 -- | A quasiquoter for hexadecimal floating-point literals.
 -- See: <http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf>, pages 57-58.
