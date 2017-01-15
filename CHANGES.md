@@ -1,7 +1,11 @@
 * Hackage: <http://hackage.haskell.org/package/FloatingHex>
 * GitHub:  <http://github.com/LeventErkok/FloatingHex/>
 
-* Latest Hackage released version: 0.3, 2017-01-15
+* Latest Hackage released version: 0.4, 2017-01-15
+
+### Version 0.4, 2017-01-15
+
+  * Export the new FloatingHexReader class. Useful when used as an API.
 
 ### Version 0.3, 2017-01-15
 
