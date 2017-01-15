@@ -1,9 +1,9 @@
 * Hackage: <http://hackage.haskell.org/package/FloatingHex>
 * GitHub:  <http://github.com/LeventErkok/FloatingHex/>
 
-* Latest Hackage released version: 0.2, 2017-01-15
+* Latest Hackage released version: 0.2, 2017-01-14
 
-### Version 0.3, Not yet released
+### Version 0.3, 2017-01-15
 
   * Bump up template-haskell dependency to >= 2.10. As noted by Herbert Valerio Riedel,
     FloatingHex fails to compile with older versions.

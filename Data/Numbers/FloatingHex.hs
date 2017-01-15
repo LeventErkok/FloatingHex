@@ -50,7 +50,9 @@ readHFloatAsDouble = cvt
         go cs         = parseHexFloat cs
 
 -- | Turn a hexadecimal float to an internal double, if parseable. Does not support the leading
--- '-' bit, although it does allow a leading +. (The former is best done out of the quasiquote.)
+-- '-' bit, although it does allow a leading +. (The former is best done out of the quasiquote,
+-- since TH does not cannot represent negative 0! See <https://ghc.haskell.org/trac/ghc/ticket/13124>
+-- for why we avoid this here.)
 parseHexFloat :: String -> Maybe Double
 parseHexFloat = goS . map toLower
   where goS ('+':rest) = go0 rest
