@@ -2,3 +2,5 @@
 dist
 tags
 TAGS
+cabal.project.local
+dist-newstyle/

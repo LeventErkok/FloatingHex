@@ -17,35 +17,30 @@ endef
 all: install
 
 install: $(DEPSRCS) Makefile
-	@-ghc-pkg unregister FloatingHex
 	$(call mkTags)
-	@$(CABAL) configure --disable-library-profiling
-	@(set -o pipefail; $(CABAL) build --ghc-options=-Werror 2>&1)
-	@$(CABAL) copy
-	@$(CABAL) register
+	@$(TIME) cabal new-install --lib
 
 test: install
 	@echo "*** Starting inline tests.."
-	@(set -o pipefail; $(TIME) doctest ${TSTSRCS} 2>&1)
+	@$(TIME) doctest Data/Numbers/FloatingHex --fast --no-magic -package random
 
 sdist: install
 	@(set -o pipefail; $(CABAL) sdist)
 
 veryclean: clean
-	@-ghc-pkg unregister FloatingHex
 
 clean:
 	@rm -rf dist
 
 docs:
-	@(set -o pipefail; $(CABAL) haddock --haddock-option=--no-warnings --hyperlink-source 2>&1)
+	cabal new-haddock --haddock-option=--hyperlinked-source --haddock-option=--no-warnings
 
 release: clean install sdist hlint test docs
 	@echo "*** FloatingHex is ready for release!"
 
-hlint: install
+hlint:
 	@echo "Running HLint.."
-	@hlint Data -q -rhlintReport.html -i "Use otherwise" -i "Parse error"
+	@hlint Data -i "Use otherwise" -i "Parse error"
 
 tags:
 	$(call mkTags)

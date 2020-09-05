@@ -1,5 +1,5 @@
 Name:                FloatingHex
-Version:             0.4
+Version:             0.5
 Synopsis:            Read and write hexadecimal floating point numbers
 Description:         Read and write hexadecimal floating point numbers. Provides a quasiquoter for
                      entering hex-float literals, and a function for printing them in hexadecimal.
