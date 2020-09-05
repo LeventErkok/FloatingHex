@@ -23,7 +23,7 @@ module Data.Numbers.FloatingHex (
 
 import Data.Char  (toLower)
 import Data.Ratio ((%))
-import Numeric    (showHex, floatToDigits)
+import Numeric    (showHex)
 import GHC.Float
 
 import qualified Language.Haskell.TH.Syntax as TH
